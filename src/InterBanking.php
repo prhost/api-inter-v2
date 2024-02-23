@@ -13,6 +13,7 @@ class InterBanking
     protected $optionsRequest = [];
 
     private $client;
+
     function __construct(array $config)
     {
         $this->client = new Client([
@@ -35,8 +36,8 @@ class InterBanking
             'headers' => [
                 'Accept' => 'application/json'
             ],
-            'cert' => $config['certificate'],
-            'verify' => $verify,
+            'cert'    => $config['certificate'],
+            'verify'  => $verify,
             'ssl_key' => $config['certificateKey'],
         ];
     }
@@ -48,10 +49,10 @@ class InterBanking
     {
         $options = $this->optionsRequest;
         $options['form_params'] = [
-            'client_id' => $client_id,
+            'client_id'     => $client_id,
             'client_secret' => $client_secret,
-            'grant_type' => 'client_credentials',
-            'scope' => $scope
+            'grant_type'    => 'client_credentials',
+            'scope'         => $scope
         ];
 
         try {
@@ -61,12 +62,11 @@ class InterBanking
                 $options
             );
 
-            return (array) json_decode($response->getBody()->getContents());
+            return (array)json_decode($response->getBody()->getContents());
         } catch (ClientException $e) {
-            return $this->parseResultClient($e);
+            throw new ApiInterException("Falha ao obter token", 0, $e);
         } catch (\Exception $e) {
-            $response = $e->getMessage();
-            return ['error' => $response];
+            throw new ApiInterException($e->getMessage(), 0, $e);
         }
     }
 
@@ -861,10 +861,9 @@ class InterBanking
             $result = json_decode($response->getBody()->getContents());
             return array('status' => $statusCode, 'response' => $result);
         } catch (ClientException $e) {
-            return $this->parseResultClient($e);
+            throw new ApiInterException("Falha a Criar Cobranca imediata", 0, $e, $e);
         } catch (\Exception $e) {
-            $response = $e->getMessage();
-            return ['error' => "Falha a Criar Cobranca imediata: {$response}"];
+            throw new ApiInterException($e->getMessage(), 0, $e);
         }
     }
 
@@ -886,10 +885,9 @@ class InterBanking
             $result = json_decode($response->getBody()->getContents());
             return array('status' => $statusCode, 'response' => $result);
         } catch (ClientException $e) {
-            return $this->parseResultClient($e);
+            throw new ApiInterException("Falha a Criar Cobranca imediata", 0, $e, $e);
         } catch (\Exception $e) {
-            $response = $e->getMessage();
-            return ['error' => "Falha a Criar Cobranca imediata: {$response}"];
+            throw new ApiInterException("Falha a Criar Cobranca imediata: " . $e->getMessage(), 0, $e);
         }
     }
 
@@ -908,10 +906,9 @@ class InterBanking
             $result = json_decode($response->getBody()->getContents());
             return array('status' => $statusCode, 'response' => $result);
         } catch (ClientException $e) {
-            return $this->parseResultClient($e);
+            throw new ApiInterException("Falha ao Consultar Cobranca imediata", 0, $e, $e);
         } catch (\Exception $e) {
-            $response = $e->getMessage();
-            return ['error' => "Falha ao Consultar Cobranca imediata: {$response}"];
+            throw new ApiInterException("Falha ao Consultar Cobranca imediata: " . $e->getMessage(), 0, $e);
         }
     }
 
@@ -1184,10 +1181,9 @@ class InterBanking
             $result = json_decode($response->getBody()->getContents());
             return array('status' => $statusCode, 'response' => $result);
         } catch (ClientException $e) {
-            return $this->parseResultClient($e);
+            throw new ApiInterException("Falha ao criar Webhook Pix", 0, $e, $e);
         } catch (\Exception $e) {
-            $response = $e->getMessage();
-            return ['error' => "Falha ao criar Webhook Pix: {$response}"];
+            throw new ApiInterException("Falha ao criar Webhook Pix: " . $e->getMessage(), 0, $e);
         }
     }
 
