@@ -372,6 +372,36 @@ class InterBanking
         }
     }
 
+
+    /**
+     * @param string $webhookUrl
+     * @param string $tipoWebhook pix-pagamento|boleto-pagamento
+     * @return array|string[]
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function criarWebhookBanking(string $webhookUrl, string $tipoWebhook)
+    {
+        $options = $this->optionsRequest;
+        $options['body'] = json_encode(['webhookUrl' => $webhookUrl]);
+        $options['headers']['Content-Type'] = 'application/json';
+        $options['headers']['Authorization'] = "Bearer {$this->token}";
+        try {
+            $response = $this->client->request(
+                'PUT',
+                "/banking/v2/webhook/{$tipoWebhook}",
+                $options
+            );
+            $statusCode = $response->getStatusCode();
+            $result = json_decode($response->getBody()->getContents());
+            return array('status' => $statusCode, 'response' => $result);
+        } catch (ClientException $e) {
+            return $this->parseResultClient($e);
+        } catch (\Exception $e) {
+            $response = $e->getMessage();
+            return ['error' => "Falha ao criar Webhook: {$response}"];
+        }
+    }
+
     public function obterWebhookCadastrado()
     {
         $options = $this->optionsRequest;
